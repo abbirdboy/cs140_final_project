@@ -13,8 +13,11 @@ int main(int argc, char * argv[]) {
 
    // initialize model with training file
    NB_Classifier model = NB_Classifier(Xtrain, Ytrain, 500, 41567);
+   model.fit();
+   vector<int> x = model.predict(Xtrain, 500);
 
-
+   for(int i = 0; i < x.size(); i++)
+      cout << x[i] << endl;
 
 
    return 0;
