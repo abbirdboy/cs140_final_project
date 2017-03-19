@@ -57,4 +57,4 @@ def run(Xtrain_file, Ytrain_file, test_data_file=None, pred_file=None):
 
 # define other functions here
 if __name__ == '__main__':
-    run('../data/Xtrain.csv', '../data/Ytrain.csv', '../data/Xtrain.csv', '../data/pred_file.csv')
+    run('../../data/Xtrain.csv', '../../data/Ytrain.csv', '../../data/Xtrain.csv', '../../data/pred_file.csv')

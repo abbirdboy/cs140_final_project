@@ -71,6 +71,9 @@ def run(Xtrain_file, Ytrain_file, test_data_file=None, pred_file=None):
     Y_train = np.genfromtxt(Ytrain_file, delimiter=',').astype(int)
     Y_train[Y_train == 0] = -1
     
+    print X_train.shape
+    print Y_train.shape
+    
     print "It took {} seconds to load files".format(time.time()-start)
     
     
