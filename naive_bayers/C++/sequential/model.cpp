@@ -51,7 +51,7 @@ int NB_Classifier::class_count(int c)
 
    int count = 0;
 
-   for(int i = 0; i < this->Ytrain.size();i++)
+   for(size_t i = 0; i < this->Ytrain.size();i++)
    {
       if(c == (int)this->Ytrain[i])
       {
@@ -69,7 +69,7 @@ int NB_Classifier::class_count(int c)
 int NB_Classifier::sum(vector<int>& vec)
 {
    int sum = 0;
-   for(int i = 0; i < vec.size(); i++)
+   for(size_t i = 0; i < vec.size(); i++)
       sum += vec[i];
 
    return sum;
@@ -79,7 +79,7 @@ int NB_Classifier::sum(vector<int>& vec)
 void NB_Classifier::sum_vector(vector<double>& vec1, vector<int>& vec2)
 {
 
-   for(int i = 0; i < vec1.size(); i++)
+   for(size_t i = 0; i < vec1.size(); i++)
       vec1[i] += vec2[i];
 
 }
@@ -134,7 +134,7 @@ void NB_Classifier::fit()
    //           self.class_1_wtot += np.sum(x)
    //           self.class_1_vectot += x
 
-   for(int i = 0; i < this->Ytrain.size(); i++)
+   for(size_t i = 0; i < this->Ytrain.size(); i++)
    {
       if(this->Ytrain[i] == 0)
       {
@@ -241,7 +241,7 @@ vector<int> NB_Classifier::predict(string X_predict, int rows)
       string value;
       // vector <int> row;
 
-      for(int j = 0; j < this->Xtrain[0].size(); j++)
+      for(size_t j = 0; j < this->Xtrain[0].size(); j++)
       {
          getline(lineStream, value,',');
          int val = stoi(value);
@@ -276,7 +276,15 @@ vector<int> NB_Classifier::predict(string X_predict, int rows)
 
    }
 
+   // output the prediction accuracy
+   int count = 0;
 
+   for(size_t i = 0; i < preds.size(); i++)
+      if(preds[i] == Ytrain[i])
+         count++;
+
+   cout << "Prediction accuracy is: " << (float)count/(float)Ytrain.size();
+   cout << endl;
 
 
    return preds;
