@@ -20,7 +20,8 @@ class VP_Classifier {
       int sum(vector<int>&);
       int dot(vector<int>&, vector<int>&);
       int sign(int);
-
+      vector<int> scalar_mult(vector<int>, int);
+      vector<int> add(vector<int>, vector<int>);
       // Global class variables
       vector< vector<int> > Xtrain;
       vector<int> Ytrain;

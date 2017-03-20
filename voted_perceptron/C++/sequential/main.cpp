@@ -15,10 +15,11 @@ int main(int argc, char * argv[]) {
    model.fit(10);
 
    // return predictions
-   // vector<int> x = model.predict(Xtrain, 500);
+   vector<int> x = model.predict(Xtrain, 500);
 
 
    // output predictions
+   cout << x.size() << endl;
    // for(int i = 0; i < x.size(); i++)
    //    cout << x[i] << endl;
 

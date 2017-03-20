@@ -33,7 +33,18 @@ VP_Classifier::VP_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
       }
 
       this->Xtrain.push_back(row);
-      this->Ytrain.push_back(stoi(Yval));
+      if(stoi(Yval) == 0)
+      {
+         this->Ytrain.push_back(-1);
+
+      }
+      else
+      {
+
+         this->Ytrain.push_back(1);
+
+      }
+
 
    }
 
@@ -67,8 +78,11 @@ void VP_Classifier::fit(int e = 10)
          }
          else
          {
+            vector<int> r = VP_Classifier::add(this->w[k], VP_Classifier::scalar_mult(this->Xtrain[j], this->Ytrain[j]));
             // this->w.push_back()
-
+            this->w.push_back(r);
+            this->c.push_back(1);
+            k += 1;
 
          }
 
@@ -87,80 +101,57 @@ vector<int> VP_Classifier::predict(string X_predict, int rows)
 {
 
 
-   // preds = []
-   //   y_hat = 0
-   //
-   //   for x_test in X:
-   //       for i in range(len(self.c)):
-   //           y_hat += self.c[i] * np.sign(np.dot(self.w[i], x_test))
-   //
-   //       if int(np.sign(y_hat)) == -1:
-   //           preds.append(0)
-   //       else:
-   //           preds.append(1)
-   //       y_hat = 0
-   //
-   //   return preds
-
+   int y_hat = 0;
    // read in the test file
    // vector< vector<int> > X_test;
 
    ifstream X_file(X_predict.c_str());
-
    string Xline;
 
 
    // prediction vector
    vector<int> preds;
-   // double sum_0 = this->log_class_0_prior;
-   // double sum_1 = this->log_class_1_prior;
-   //
-   //
-   //
-   // for(int i = 0; i < rows; i++)
-   // {
-   //
-   //    getline(X_file, Xline);
-   //
-   //    stringstream lineStream(Xline);
-   //    string value;
-   //    // vector <int> row;
-   //
-   //    for(int j = 0; j < this->Xtrain[0].size(); j++)
-   //    {
-   //       getline(lineStream, value,',');
-   //       int val = stoi(value);
-   //
-   //       if(val != 0)
-   //       {
-   //          sum_0 += this->loglike_0_vec[i]*(float)val;
-   //          sum_1 += this->loglike_1_vec[i]*(float)val;
-   //       }
-   //
-   //
-   //       // row.push_back(stoi(value));
-   //    }
-   //
-   //    // cout << sum_0 << endl;
-   //    if(sum_0 > sum_1)
-   //    {
-   //       preds.push_back(0);
-   //    }
-   //    else
-   //    {
-   //
-   //       preds.push_back(1);
-   //
-   //    }
-   //
-   //    sum_0 = this->log_class_0_prior;
-   //    sum_1 = this->log_class_1_prior;
-   //
-   //
-   //    // X_test.push_back(row);
-   //
-   // }
-   //
+
+
+   for(int i = 0; i < rows; i++)
+   {
+
+      getline(X_file, Xline);
+
+      stringstream lineStream(Xline);
+      string value;
+      vector <int> row;
+
+      for(int j = 0; j < this->Xtrain[0].size(); j++)
+      {
+         getline(lineStream, value,',');
+         row.push_back(stoi(value));
+      }
+
+      for(int i = 0; i < this->c.size(); i++)
+      {
+         y_hat += this->c[i] * VP_Classifier::sign(VP_Classifier::dot(this->w[i], row));
+
+         if(VP_Classifier::sign(y_hat) == -1)
+         {
+            preds.push_back(0);
+
+         }
+         else
+         {
+            preds.push_back(1);
+
+         }
+
+         y_hat = 0;
+
+      }
+
+
+      // X_test.push_back(row);
+
+   }
+
 
 
 
@@ -181,8 +172,29 @@ vector<int> VP_Classifier::predict(string X_predict, int rows)
 
 
 
+vector<int> VP_Classifier::scalar_mult(vector<int>vec, int s)
+{
+   for(int i = 0; i < vec.size(); i++)
+      vec[i] *= s;
+
+   return vec;
+
+}
 
 
+vector<int> VP_Classifier::add(vector<int> vec1, vector<int> vec2)
+{
+
+   vector<int> resultVec = vector<int>(vec1.size(), 0);
+
+
+   for(int i = 0; i < vec1.size(); i++)
+      resultVec[i] = vec1[i] + vec2[i];
+
+
+   return resultVec;
+
+}
 
 
 int VP_Classifier::sum(vector<int>& vec)
