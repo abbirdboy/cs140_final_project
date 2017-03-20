@@ -1,4 +1,4 @@
-CXX = g++
+CXX = icc
 # CXX = clang++ # has better error messages
 
 CFLAGS = -c -Wall -O2 -std=c++0x

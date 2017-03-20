@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <cmath>
+#include <cilk/cilk.h>
 
 
 // Constructor: Loads Xtrain and Ytrain files
@@ -15,6 +16,12 @@ NB_Classifier::NB_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
    string Xline;
    string Yval;
 
+   Xtrain_arr = new int*[rows];
+   Xtrain_arr[0:rows] = new int[cols];
+
+
+   Ytrain_arr = new int[rows];
+
    for(int i = 0; i < rows; i++)
    {
 
@@ -24,16 +31,19 @@ NB_Classifier::NB_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
 
       stringstream lineStream(Xline);
       string value;
-      vector <int> row;
+      // vector <int> row;
 
       for(int j = 0; j < cols; j++)
       {
          getline(lineStream, value,',');
-         row.push_back(stoi(value));
+         // Xtrain_arr[cols * i + j] = stoi(value);
+         Xtrain_arr[i][j] = stoi(value);
+         // row.push_back(stoi(value));
       }
 
-      this->Xtrain.push_back(row);
-      this->Ytrain.push_back(stoi(Yval));
+      // this->Xtrain.push_back(row);
+      // this->Ytrain.push_back(stoi(Yval));
+      Ytrain_arr[i] = stoi(Yval);
 
    }
 
@@ -43,7 +53,11 @@ NB_Classifier::NB_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
 
 }
 
-NB_Classifier::~NB_Classifier() { }
+NB_Classifier::~NB_Classifier() {
+   // delete[] Xtrain_arr;
+   // delete[] Ytrain_arr;
+
+ }
 
 
 int NB_Classifier::class_count(int c)

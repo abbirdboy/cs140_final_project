@@ -25,6 +25,9 @@ class NB_Classifier {
       vector< vector<int> > Xtrain;
       vector<int> Ytrain;
 
+      int ** Xtrain_arr;
+      int *Ytrain_arr;
+
       vector<double> loglike_0_vec;
       vector<double> loglike_1_vec;
 
