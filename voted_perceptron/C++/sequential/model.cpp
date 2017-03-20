@@ -169,13 +169,6 @@ vector<int> VP_Classifier::predict(string X_predict, int rows)
 
 
 
-
-
-
-
-
-
-
 vector<int> VP_Classifier::scalar_mult(vector<int>vec, int s)
 {
    for(int i = 0; i < vec.size(); i++)
