@@ -6,30 +6,27 @@
 
 using namespace std;
 
-class NB_Classifier {
+class VP_Classifier {
 
    public:
-      NB_Classifier(string , string , int , int);
-      void fit();
+      VP_Classifier(string , string , int , int);
+      void fit(int);
       vector<int> predict(string, int);
-      ~NB_Classifier();
+      ~VP_Classifier();
 
 
    private:
       // Private Helper functions
-      int class_count(int c);
       int sum(vector<int>&);
-      void sum_vector(vector<double>&, vector<int>&);
+      int dot(vector<int>&, vector<int>&);
+      int sign(int);
 
       // Global class variables
       vector< vector<int> > Xtrain;
       vector<int> Ytrain;
 
-      vector<double> loglike_0_vec;
-      vector<double> loglike_1_vec;
-
-      double log_class_0_prior;
-      double log_class_1_prior;
+      vector<int> c;
+      vector< vector<int> > w;
 
 };
 #endif

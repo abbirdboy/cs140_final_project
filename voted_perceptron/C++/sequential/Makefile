@@ -4,9 +4,9 @@ CXX = g++
 CFLAGS = -c -Wall -O2
 
 
-all: naive_bayers
+all: voted_perceptron
 
-naive_bayers: main.o model.o
+ voted_perceptron: main.o model.o
 	$(CXX) $^ -o $@
 
 main.o: main.cpp
@@ -16,4 +16,4 @@ model.o: model.cpp
 	$(CXX) $(CFLAGS) model.cpp
 
 clean:
-	rm *o naive_bayers
+	rm *o voted_perceptron
