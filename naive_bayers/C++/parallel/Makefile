@@ -1,7 +1,7 @@
 CXX = g++
 # CXX = clang++ # has better error messages
 
-CFLAGS = -c -Wall -O2
+CFLAGS = -c -Wall -O2 -std=c++0x
 
 
 all: naive_bayers
