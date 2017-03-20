@@ -32,25 +32,25 @@ VP_Classifier::VP_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
          row.push_back(stoi(value));
       }
 
-      this->Xtrain.push_back(row);
+      Xtrain.push_back(row);
       if(stoi(Yval) == 0)
       {
-         this->Ytrain.push_back(-1);
+         Ytrain.push_back(-1);
 
       }
       else
       {
 
-         this->Ytrain.push_back(1);
+         Ytrain.push_back(1);
 
       }
 
 
    }
 
-   // cout << this->Xtrain[0].size() << endl;
-   // cout << this->Xtrain.size() << endl;
-   // cout << this->Ytrain.size() << endl;
+   // cout << Xtrain[0].size() << endl;
+   // cout << Xtrain.size() << endl;
+   // cout << Ytrain.size() << endl;
 
 }
 
@@ -62,26 +62,27 @@ void VP_Classifier::fit(int e = 10)
    int k = 0;
    int y_hat = 0;
 
-   this->c = vector<int>(1, 0);
-   this->w.push_back(vector<int>(this->Xtrain[0].size(), 0));
+   c = vector<int>(1, 0);
+   w.push_back(vector<int>(Xtrain[0].size(), 0));
 
    for(int i = 0; i < e; i++)
    {
-      for(int j = 0; j < this->Xtrain.size(); j++)
+      for(int j = 0; j < Xtrain.size(); j++)
       {
 
-         y_hat = VP_Classifier::sign(VP_Classifier::dot(this->Xtrain[j], this->w[k]));
+         y_hat = VP_Classifier::sign(VP_Classifier::dot(Xtrain[j], w[k]));
 
-         if(y_hat == this->Ytrain[j])
+
+         if(y_hat == Ytrain[j])
          {
-            this->c[k] += 1;
+            c[k] += 1;
          }
          else
          {
-            vector<int> r = VP_Classifier::add(this->w[k], VP_Classifier::scalar_mult(this->Xtrain[j], this->Ytrain[j]));
-            // this->w.push_back()
-            this->w.push_back(r);
-            this->c.push_back(1);
+            vector<int> r = VP_Classifier::add(w[k], VP_Classifier::scalar_mult(Xtrain[j], Ytrain[j]));
+            // w.push_back()
+            w.push_back(r);
+            c.push_back(1);
             k += 1;
 
          }
@@ -91,7 +92,6 @@ void VP_Classifier::fit(int e = 10)
 
 
    }
-
 
 
 }
@@ -122,38 +122,42 @@ vector<int> VP_Classifier::predict(string X_predict, int rows)
       string value;
       vector <int> row;
 
-      for(int j = 0; j < this->Xtrain[0].size(); j++)
+      for(int j = 0; j < Xtrain[0].size(); j++)
       {
          getline(lineStream, value,',');
          row.push_back(stoi(value));
       }
 
-      for(int i = 0; i < this->c.size(); i++)
+      for(int i = 0; i < c.size(); i++)
+         y_hat += c[i] * VP_Classifier::sign(VP_Classifier::dot(w[i], row));
+
+
+      if(VP_Classifier::sign(y_hat) == -1)
       {
-         y_hat += this->c[i] * VP_Classifier::sign(VP_Classifier::dot(this->w[i], row));
+         preds.push_back(-1);
 
-         if(VP_Classifier::sign(y_hat) == -1)
-         {
-            preds.push_back(0);
-
-         }
-         else
-         {
-            preds.push_back(1);
-
-         }
-
-         y_hat = 0;
+      }
+      else
+      {
+         preds.push_back(1);
 
       }
 
+      y_hat = 0;
 
       // X_test.push_back(row);
 
    }
 
+   // output the prediction accuracy
+   int count = 0;
 
+   for(int i = 0; i < preds.size(); i++)
+      if(preds[i] == Ytrain[i])
+         count++;
 
+   cout << "Prediction accuracy is: " << (float)count/(float)Ytrain.size();
+   cout << endl;
 
    return preds;
 

@@ -19,7 +19,7 @@ int main(int argc, char * argv[]) {
 
 
    // output predictions
-   cout << x.size() << endl;
+   // cout << x.size() << endl;
    // for(int i = 0; i < x.size(); i++)
    //    cout << x[i] << endl;
 
