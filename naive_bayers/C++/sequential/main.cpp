@@ -10,14 +10,14 @@ using namespace std;
 
 int main(int argc, char * argv[]) {
 
-   string Xtrain ("../../../data/Xtrain.csv");
-   string Ytrain ("../../../data/Ytrain.csv");
+   string Xtrain ("../../../data/Xtrain2000.csv");
+   string Ytrain ("../../../data/Ytrain2000.csv");
 
    clock_t begin = clock();
 
 
    // initialize model with training file
-   NB_Classifier model = NB_Classifier(Xtrain, Ytrain, 500, 41567);
+   NB_Classifier model = NB_Classifier(Xtrain, Ytrain, 2000, 41567);
 
    clock_t end = clock();
    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -36,7 +36,7 @@ int main(int argc, char * argv[]) {
 
    begin = clock();
    // return predictions
-   vector<int> x = model.predict(Xtrain, 500);
+   vector<int> x = model.predict(Xtrain, 2000);
 
    end = clock();
    elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;

@@ -7,15 +7,15 @@ using namespace std;
 
 int main(int argc, char * argv[]) {
 
-   string Xtrain ("../../../data/Xtrain.csv");
-   string Ytrain ("../../../data/Ytrain.csv");
+   string Xtrain ("../../../data/Xtrain2000.csv");
+   string Ytrain ("../../../data/Ytrain2000.csv");
 
    // initialize model with training file
-   VP_Classifier model = VP_Classifier(Xtrain, Ytrain, 500, 41567);
+   VP_Classifier model = VP_Classifier(Xtrain, Ytrain, 2000, 41567);
    model.fit(10);
 
    // return predictions
-   vector<int> x = model.predict(Xtrain, 500);
+   vector<int> x = model.predict(Xtrain, 2000);
 
 
    // output predictions
