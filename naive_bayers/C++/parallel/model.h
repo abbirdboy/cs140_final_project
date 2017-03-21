@@ -25,11 +25,17 @@ class NB_Classifier {
       vector< vector<int> > Xtrain;
       vector<int> Ytrain;
 
+      int r;
+      int c;
+
       int ** Xtrain_arr;
       int *Ytrain_arr;
 
-      vector<double> loglike_0_vec;
-      vector<double> loglike_1_vec;
+      double *loglike_0_vec;
+      double *loglike_1_vec;
+
+      // vector<double> loglike_0_vec;
+      // vector<double> loglike_1_vec;
 
       double log_class_0_prior;
       double log_class_1_prior;

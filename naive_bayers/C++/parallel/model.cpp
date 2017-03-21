@@ -5,11 +5,16 @@
 #include <string>
 #include <cmath>
 #include <cilk/cilk.h>
+#include <cilk/reducer_opadd.h>
 
 
 // Constructor: Loads Xtrain and Ytrain files
 NB_Classifier::NB_Classifier(string Xtrain_file, string Ytrain_file, int rows, int cols)
 {
+   int r = rows;
+   int c = cols;
+
+
    ifstream X_file(Xtrain_file.c_str());
    ifstream Y_file(Ytrain_file.c_str());
 
@@ -55,25 +60,31 @@ NB_Classifier::NB_Classifier(string Xtrain_file, string Ytrain_file, int rows, i
 
 NB_Classifier::~NB_Classifier() {
    // delete[] Xtrain_arr;
-   // delete[] Ytrain_arr;
+   delete[] Ytrain_arr;
+
+   // delete Xtrain_arr[0:r][0:c];
+
+   // delete[] Xtrain_arr;
 
  }
 
 
-int NB_Classifier::class_count(int c)
+int NB_Classifier::class_count(int e)
 {
 
    int count = 0;
 
-   for(size_t i = 0; i < this->Ytrain.size();i++)
-   {
-      if(c == (int)this->Ytrain[i])
-      {
-         count++;
-         // cout << this->Ytrain[i] << endl;
-      }
-   }
+   // for(size_t i = 0; i < this->Ytrain.size();i++)
+   // {
+   //    if(c == (int)this->Ytrain[i])
+   //    {
+   //       count++;
+   //       // cout << this->Ytrain[i] << endl;
+   //    }
+   // }
 
+   if(Ytrain_arr[0:r] == e)
+      count++;
 
 
    return count;
@@ -102,42 +113,58 @@ void NB_Classifier::sum_vector(vector<double>& vec1, vector<int>& vec2)
 void NB_Classifier::fit()
 {
    // training set size
-   int train_size = this->Ytrain.size();
+   int train_size = r;
 
    // number of instances per class
    // cout << "The size of Y labels " << this->Ytrain.size() << endl;
    // cout << "The number of zero classes in Y: " << NB_Classifier::class_count(0) << endl;
    // cout << "The number of zero classes in Y: " << NB_Classifier::class_count(1) << endl;
 
-   int class_0 = NB_Classifier::class_count(0);
-   int class_1 = NB_Classifier::class_count(1);
+   // int class_0 = NB_Classifier::class_count(0);
+   // int class_1 = NB_Classifier::class_count(1);
+
 
    // log priors
-   this->log_class_0_prior = log((float)class_0 / (float)train_size);
-   this->log_class_1_prior = log((float)class_1 / (float)train_size);
+   // log_class_0_prior = log((float)class_0 / (float)train_size);
+   // log_class_1_prior = log((float)class_1 / (float)train_size);
 
    // cout << "Log prior of 0: " << this->log_class_1_prior << endl;
 
 
    // total vocabulary
-   int V = this->Xtrain[0].size();
+   int V = c;
 
 
    // total tokens in each class (scalar)
-   double class_0_wtot = 0 + V*0.5;
-   double class_1_wtot = 0 + V*0.5;
+   cilk::reducer< cilk::op_add<double> > class_0_wtot(0 + V*0.5);
+   cilk::reducer< cilk::op_add<double> > class_1_wtot(0 + V*0.5);
+
+   // double class_0_wtot = 0 + V*0.5;
+   // double class_1_wtot = 0 + V*0.5;
 
 
    // cout << "weight initial of 0: " <<  class_0_wtot << endl;
 
 
    // total per token in each class (vector)
-   vector<double> class_0_vectot(this->Xtrain[0].size(), 0.5);
-   vector<double> class_1_vectot(this->Xtrain[0].size(), 0.5);
+   // vector<double> class_0_vectot(Xtrain[0].size(), 0.5);
+   // vector<double> class_1_vectot(Xtrain[0].size(), 0.5);
+
+
+   double *class_0_vectot = new double[c];
+   class_0_vectot[0:c] = 0.5;
+   double *class_1_vectot = new double[c];
+   class_1_vectot[0:c] = 0.5;
 
    // loglikelihood per word per class
-   this->loglike_0_vec = vector<double>(this->Xtrain[0].size(), 0.0);
-   this->loglike_1_vec = vector<double>(this->Xtrain[0].size(), 0.0);
+   // loglike_0_vec = vector<double>(Xtrain[0].size(), 0.0);
+   // loglike_1_vec = vector<double>(Xtrain[0].size(), 0.0);
+
+   loglike_0_vec = new double[c];
+   loglike_0_vec[0:c] = 0.0;
+
+   loglike_1_vec = new double[c];
+   loglike_1_vec[0:c] = 0.0;
 
    //   # sum of the total tokens
    //   for x, y in zip(X, y):
@@ -148,18 +175,25 @@ void NB_Classifier::fit()
    //           self.class_1_wtot += np.sum(x)
    //           self.class_1_vectot += x
 
-   for(size_t i = 0; i < this->Ytrain.size(); i++)
+   for(size_t i = 0; i < r; i++)
    {
-      if(this->Ytrain[i] == 0)
+      if(Ytrain_arr[i] == 0)
       {
-         class_0_wtot += NB_Classifier::sum(this->Xtrain[i]);
-         NB_Classifier::sum_vector(class_0_vectot, this->Xtrain[i]);
+
+         // __sec_reduce_add(Xtrain_arr[i][0:c]);
+         // __sec_reduce_add(class_0_vectot[0:c]);
+         // *class_0_wtot +=  __sec_reduce_add((Xtrain_arr[i][0:c]));
+         // class_0_vectot[0:c] = class_0_vectot[0:c] + Xtrain_arr[i][0:c];
+         // *class_0_wtot += NB_Classifier::sum(Xtrain[i]);
+         // NB_Classifier::sum_vector(class_0_vectot, Xtrain[i]);
 
       }
       else
       {
-         class_1_wtot += NB_Classifier::sum(this->Xtrain[i]);
-         NB_Classifier::sum_vector(class_1_vectot, this->Xtrain[i]);
+         // *class_1_wtot +=  __sec_reduce_add((Xtrain_arr[i][0:c]));
+         // class_1_vectot[0:c] = class_1_vectot[0:c] + Xtrain_arr[i][0:c];
+         // *class_1_wtot += NB_Classifier::sum(Xtrain[i]);
+         // NB_Classifier::sum_vector(class_1_vectot, Xtrain[i]);
 
          // cout << this->Xtrain[i][1] << endl;
          // cout << class_1_vectot[1] << endl;
@@ -175,53 +209,12 @@ void NB_Classifier::fit()
    //       self.loglike_0_vec[i] = math.log(self.class_0_vectot[i]/float(self.class_0_wtot))
    //       self.loglike_1_vec[i] = math.log(self.class_1_vectot[i]/float(self.class_1_wtot))
 
-   for(int i = 0; i < V; i++)
-   {
-      this->loglike_0_vec[i] = log(class_0_vectot[i]/(float)class_0_wtot);
-      this->loglike_1_vec[i] = log(class_1_vectot[i]/(float)class_1_wtot);
-
-   }
-
-
-   //   # train set size
-   //   self.train_size = float(len(y))
-     //
-   //   # number of instances per class
-   //   self.class_0, self.class_1 = np.bincount(y)
-     //
-   //   # log priors
-   //   self.log_class_0_prior = math.log(self.class_0 / self.train_size)
-   //   self.log_class_1_prior = math.log(self.class_1 / self.train_size)
-     //
-   //   # total vocabulary
-   //   self.V = len(X[0])
-     //
-   //   # total tokens in each class (scalar)
-   //   self.class_0_wtot = 0 + self.V*0.5 # add one-smoothing of 0.5
-   //   self.class_1_wtot = 0 + self.V*0.5 # add one-smoothing
-     //
-   //   # total per token in each class (vector)
-   //   self.class_0_vectot = np.full(len(X[0]), 0.5) # ones == add one-smoothing
-   //   self.class_1_vectot = np.full(len(X[0]), 0.5)
-     //
-   //   self.loglike_0_vec = np.zeros(len(X[0]), dtype=np.int)
-   //   self.loglike_1_vec = np.zeros(len(X[0]), dtype=np.int)
-     //
-   //   # sum of the total tokens
-   //   for x, y in zip(X, y):
-   //       if y == 0:
-   //           self.class_0_wtot += np.sum(x)
-   //           self.class_0_vectot += x
-   //       else:
-   //           self.class_1_wtot += np.sum(x)
-   //           self.class_1_vectot += x
-     //
-   //   for i in range(self.V):
-   //       self.loglike_0_vec[i] = math.log(self.class_0_vectot[i]/float(self.class_0_wtot))
-   //       self.loglike_1_vec[i] = math.log(self.class_1_vectot[i]/float(self.class_1_wtot))
-
-
-
+   // for(int i = 0; i < V; i++)
+   // {
+   //    loglike_0_vec[i] = log(class_0_vectot[i]/(float)class_0_wtot.get_value());
+   //    loglike_1_vec[i] = log(class_1_vectot[i]/(float)class_1_wtot.get_value());
+   //
+   // }
 
 
 
@@ -241,8 +234,8 @@ vector<int> NB_Classifier::predict(string X_predict, int rows)
 
    // prediction vector
    vector<int> preds;
-   double sum_0 = this->log_class_0_prior;
-   double sum_1 = this->log_class_1_prior;
+   double sum_0 = log_class_0_prior;
+   double sum_1 = log_class_1_prior;
 
 
 
@@ -294,10 +287,10 @@ vector<int> NB_Classifier::predict(string X_predict, int rows)
    int count = 0;
 
    for(size_t i = 0; i < preds.size(); i++)
-      if(preds[i] == Ytrain[i])
+      if(preds[i] == Ytrain_arr[i])
          count++;
 
-   cout << "Prediction accuracy is: " << (float)count/(float)Ytrain.size();
+   cout << "Prediction accuracy is: " << (float)count/(float)r;
    cout << endl;
 
 
